@@ -80,10 +80,20 @@ fn build_tree_visualisation_array(
     while let Some((parent_translation, node_ids)) = children_stack.pop() {
         for node_id in node_ids {
             let node = tree.get_node_by_id(*node_id).unwrap();
-            let child_translation = parent_translation + node.payload.translation;
+            let local_translation = node.payload.translation;
+            let child_translation = parent_translation + local_translation;
             vis_array.push((
                 TreeVisualiserType::DebugNode,
                 Transform::from_translation(child_translation),
+            ));
+            vis_array.push((
+                TreeVisualiserType::Limb,
+                Transform::from_scale(Vec3::new(1.0, local_translation.length(), 1.0))
+                    .with_translation(parent_translation + 0.5 * local_translation)
+                    .with_rotation(Quat::from_rotation_arc(
+                        Vec3::Y,
+                        local_translation.normalize(),
+                    )),
             ));
             children_stack.push((child_translation, &node.children));
         }
