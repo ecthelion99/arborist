@@ -4,9 +4,9 @@ use slotmap::{SlotMap, new_key_type};
 new_key_type! { pub struct GraphNodeId;}
 
 pub struct TreeGraphNode<T> {
-    parent: Option<GraphNodeId>,
-    children: Vec<GraphNodeId>,
-    payload: T,
+    pub parent: Option<GraphNodeId>,
+    pub children: Vec<GraphNodeId>,
+    pub payload: T,
 }
 
 pub struct TreeGraph<T> {
@@ -39,18 +39,26 @@ impl<T> TreeGraph<T> {
         &self.nodes_sm[self.root_id]
     }
 
-    pub fn insert_node(&mut self, parent_id: GraphNodeId, payload: T) -> GraphNodeId {
+    pub fn insert_node(&mut self, parent_id: GraphNodeId, payload: T) -> Option<GraphNodeId> {
+        if !self.nodes_sm.contains_key(parent_id) {
+            return None;
+        }
         let node: TreeGraphNode<T> = TreeGraphNode {
             parent: Some(parent_id),
             children: Vec::new(),
             payload,
         };
-        self.nodes_sm.insert(node)
+        let child_id = self.nodes_sm.insert(node);
+        self.get_node_by_id_mut(parent_id)
+            .unwrap()
+            .children
+            .push(child_id);
+        Some(child_id)
     }
 }
 
 pub struct TreePayload {
-    translation: Vec3,
+    pub translation: Vec3,
 }
 
 impl TreePayload {

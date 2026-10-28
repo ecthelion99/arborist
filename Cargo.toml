@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-bevy = { version = "0.20.0", features = ["free_camera"] }
+bevy = { version = "0.20.0", features = ["free_camera", "debug"] }
 glam = "0.33.12"
 slotmap = "1.1.1"
 
